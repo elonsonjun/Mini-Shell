@@ -1,0 +1,98 @@
+# ╔═══════════════════════════════════════════════╗
+# ║            ⚙️ MiniShell Makefile               ║
+# ║         Advanced Build System (v1.0)          ║
+# ╚═══════════════════════════════════════════════╝
+
+# Compiler and flags
+CC = gcc
+CFLAGS = -Wall -Wextra -std=c99 -g
+LDFLAGS = 
+TARGET = minishell
+
+# Source files
+SRCS = main.c parser.c executor.c builtins.c utils.c history.c \
+       dashboard.c fantasy.c autocorrect.c signals.c logger.c config.c
+
+# Object files
+OBJS = $(SRCS:.c=.o)
+
+# Color codes
+GREEN=\033[0;32m
+CYAN=\033[0;36m
+NC=\033[0m
+
+# Default target
+all: banner $(TARGET)
+
+# Build target
+$(TARGET): $(OBJS)
+	@echo "$(CYAN)[🔨] Linking object files into binary...$(NC)"
+	$(CC) $(CFLAGS) -o $(TARGET) $(OBJS) $(LDFLAGS)
+	@echo "$(GREEN)[✅] Build successful!$(NC)"
+
+# Compile source files into .o files
+%.o: %.c
+	@echo "$(CYAN)[📄] Compiling $<...$(NC)"
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# Run the program
+run: all
+	@echo "$(CYAN)[🚀] Running MiniShell...$(NC)"
+	./$(TARGET)
+
+# Clean build artifacts
+clean:
+	@echo "$(CYAN)[🧹] Cleaning object files and binary...$(NC)"
+	rm -f $(OBJS) $(TARGET)
+
+# Full reinstall
+rebuild: clean all
+
+# Help command
+help:
+	@echo "$(CYAN)Usage: make [target]$(NC)"
+	@echo ""
+	@echo "  all        - Compile the project"
+	@echo "  run        - Build and run MiniShell"
+	@echo "  clean      - Remove build artifacts"
+	@echo "  rebuild    - Clean and rebuild"
+	@echo "  install    - Install binary to /usr/local/bin"
+	@echo "  uninstall  - Remove installed binary"
+	@echo "  debug      - Build with debug flags"
+	@echo "  release    - Build with optimization"
+	@echo "  banner     - Show project banner"
+	@echo "  help       - Show this message"
+
+# Show a banner
+banner:
+	@echo ""
+	@echo "╔═══════════════════════════════════════╗"
+	@echo "║          🚀 Welcome to MiniShell       ║"
+	@echo "║        (A modular C shell project)    ║"
+	@echo "╚═══════════════════════════════════════╝"
+	@echo ""
+
+# Install to /usr/local/bin
+install:
+	@echo "$(CYAN)[📦] Installing to /usr/local/bin/$(TARGET)...$(NC)"
+	sudo cp $(TARGET) /usr/local/bin/$(TARGET)
+	@echo "$(GREEN)[✔️ ] Installed successfully.$(NC)"
+
+# Uninstall
+uninstall:
+	@echo "$(CYAN)[❌] Removing /usr/local/bin/$(TARGET)...$(NC)"
+	sudo rm -f /usr/local/bin/$(TARGET)
+	@echo "$(GREEN)[✔️ ] Uninstalled successfully.$(NC)"
+
+# Debug mode
+debug:
+	@echo "$(CYAN)[🐞] Building with debug symbols...$(NC)"
+	make CFLAGS="-Wall -g -DDEBUG"
+
+# Release mode
+release:
+	@echo "$(CYAN)[🚀] Building optimized release...$(NC)"
+	make CFLAGS="-O3"
+
+# PHONY targets
+.PHONY: all clean run rebuild help install uninstall debug release banner
